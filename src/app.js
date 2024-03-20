@@ -16,8 +16,10 @@ app.use(cookieParser())
 
 import experienceRoute from "./routes/experience.routes.js"
 import userRoute from "./routes/user.routes.js"
+import reviewRoute from "./routes/review.routes.js"
 
 app.use("/api/experience", experienceRoute)
 app.use("/api/users", userRoute)
+app.use("/api/reviews", reviewRoute)
 
 export {app}

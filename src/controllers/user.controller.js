@@ -50,7 +50,7 @@ const registerUser = asyncHandler( async (req, res) => {
     // return response
 
     const {fullName, email, username, password} = req.body
-    console.log(req);
+    // console.log(req);
 
     // now we have to validate all the fields
     // instead of looping or checking all fields one by one, we can use .some() method
@@ -73,7 +73,7 @@ const registerUser = asyncHandler( async (req, res) => {
     }
 
     const avatarLocalPath = req.file?.path;
-    console.log(avatarLocalPath);
+    console.log(avatarLocalPath, "avatarLocalPath");
 
     let avatar = ""
     if (avatarLocalPath) {
