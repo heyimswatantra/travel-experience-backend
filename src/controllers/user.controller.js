@@ -32,7 +32,9 @@ const generateAccessAndRefreshToken = async (userId) => {
         return {accessToken, refreshToken}
 
     } catch (error) {
-        throw new ApiError(500, "Something went wrong while generating refresh and access token")
+        return res
+        .status(500)
+        .json(new ApiResponse(500, {}, "Something went wrong while generating refresh and access token"))
     }
 }
 
@@ -60,7 +62,9 @@ const registerUser = asyncHandler( async (req, res) => {
         [fullName, email, username, password].some((field) => 
         field?.trim() === "")
     ) {
-        throw new ApiError(400, "All fields required")
+        return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "All fields required"))
     }
 
     // find if there already exists a user with same username OR email
@@ -69,7 +73,9 @@ const registerUser = asyncHandler( async (req, res) => {
         $or : [{ username }, { email }]
     })
     if (existedUser) {
-        throw new ApiError(409, "User with email or username already exists")
+        return res
+        .status(409)
+        .json(new ApiResponse(409, {}, "User with email or username already exists"))
     }
 
     const avatarLocalPath = req.file?.path;
@@ -79,7 +85,9 @@ const registerUser = asyncHandler( async (req, res) => {
     if (avatarLocalPath) {
         avatar = await uploadOnCloudinary(avatarLocalPath)
         if (!avatar) {
-            throw new ApiError(400, "Couldn't upload avatar on cloudinary")
+            return res
+            .status(400)
+            .json(new ApiResponse(400, {}, "Couldn't upload avatar on cloudinary"))
         }
     }
 
@@ -97,13 +105,14 @@ const registerUser = asyncHandler( async (req, res) => {
     .select("-password -refreshToken")
 
     if (!createUser) {
-        throw new ApiError(500, "Something went wrong while registering the user")
+        return res
+        .status(500)
+        .json(new ApiResponse(500, {}, "Something went wrong while registering the user"))
     }
 
-    return res.status(201).json(
-        new ApiResponse(200, createUser, "User register successfully")
-    )
-
+    return res
+    .status(201)
+    .json(new ApiResponse(200, createUser, "User register successfully"))
 })
 
 const loginUser = asyncHandler( async (req, res) => {
@@ -120,7 +129,9 @@ const loginUser = asyncHandler( async (req, res) => {
     // console.log(req.body);
     
     if(!(username || email)) {
-        throw new ApiError(400, "Username or Email is required")
+        return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "Username or Email is required"))
     }
 
     const user = await User.findOne({
@@ -128,14 +139,18 @@ const loginUser = asyncHandler( async (req, res) => {
     })
 
     if(!user) {
-        throw new ApiError(404, "User does not exists")
+        return res
+        .status(404)
+        .json(new ApiResponse(404, {}, "User does not exists"))
     }
 
     // password check
     const isPasswordValid = await user.isPasswordCorrect(password)
 
     if (!isPasswordValid) {
-        throw new ApiError(401, "Incorrect Password")
+        return res
+        .status(401)
+        .json(new ApiResponse(401, {}, "Incorrect Password"))
     }
 
     // access and refresh token banao
@@ -191,7 +206,9 @@ const changePassword = asyncHandler( async (req, res) => {
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
 
     if (!isPasswordCorrect) {
-        throw new ApiError(400, "Invalid Old Password")
+        return res
+        .status(400)
+        .json(new ApiResponse(400, {},"Invalid Old Password"))
     }
 
     user.password = newPassword
@@ -233,13 +250,17 @@ const updateUserAvatar = asyncHandler (async (req, res) => {
     const avatarLocalPath = req.file?.path
 
     if (!avatarLocalPath) {
-        throw new ApiError(400, "Avatar file is missing")
+        return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "Avatar file is missing"))
     }
     
     const avatar = await uploadOnCloudinary(avatarLocalPath)
 
     if (!avatar.url) {
-        throw new ApiError(400, "Error while uploading avatar on cloudinary")
+        return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "Error while uploading avatar on cloudinary"))
     }
 
     const user = await User.findByIdAndUpdate(

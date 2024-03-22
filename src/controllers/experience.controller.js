@@ -28,7 +28,10 @@ const addExperience = asyncHandler ( async (req, res) => {
 
     const userId = req?.user._id
 
-    if (!userId) throw new ApiError(400, "Login to create Experience")
+    if (!userId) 
+    return res
+        .status(400)
+        .json(new ApiResponse(400, "Login to create Experience"))
 
     const tagArr = tags.split(",").map((item) => item.trim())
 
@@ -38,7 +41,9 @@ const addExperience = asyncHandler ( async (req, res) => {
         [title, description].some((field) => 
         field?.trim() === "")
     ) {
-        throw new ApiError(400, "All fields required")
+        return res
+        .status(400)
+        .json(new ApiResponse(400, "All fields required"))
     }
 
     const imageArr = req.files
@@ -52,7 +57,9 @@ const addExperience = asyncHandler ( async (req, res) => {
             }
             // console.log(urlArr);
             if (urlArr.length <= 0) {
-                throw new ApiError(400, "Something went wrong while uploading images")
+                return res
+                .status(400)
+                .json(new ApiResponse(400, "Something went wrong while uploading images"))
             }
         }
     
@@ -70,7 +77,9 @@ const addExperience = asyncHandler ( async (req, res) => {
         })
 
         if (!experience) {
-            throw new ApiError(500, "Couldn't add experience")
+            return res
+            .status(500)
+            .json(new ApiResponse(500, "Couldn't add experience"))  
         }
 
         const user = await User.findByIdAndUpdate(
@@ -81,14 +90,18 @@ const addExperience = asyncHandler ( async (req, res) => {
         )
 
         if (!user) {
-            throw new ApiError(500, "Couldn't add experienceId to User Scehma")
+            return res
+            .status(500)
+            .json(new ApiResponse(500, "Couldn't add experienceId to User Scehma"))
         }
     
         return res
         .status(200)
         .json(new ApiResponse(200, experience, "Experience created successfully"))
     } catch (error) {
-        throw new ApiError(500, error?.message ||"Something went wrong while creating experience")
+        return res
+        .status(500)
+        .json(new ApiResponse(500, error?.message ||"Something went wrong while creating experience"))
     }
 })
 
@@ -98,12 +111,17 @@ const updateExperience = asyncHandler ( async (req, res) => {
     } = req.body
 
     if (!experienceId) {
-        throw new ApiError(500, "Experience Id is required")
+        return res
+        .status(500)
+        .json(new ApiResponse(500, "Experience Id is required"))
     }
 
     const userId = req?.user._id
 
-    if (!userId) throw new ApiError(400, "Login to update experience")
+    if (!userId) 
+    return res
+        .status(400)
+        .json(new ApiResponse(400, "Login to update experience"))
 
     const tagArr = tags?.split(",").map((item) => item.trim())
 
@@ -113,7 +131,9 @@ const updateExperience = asyncHandler ( async (req, res) => {
         [title, description].some((field) => 
         field?.trim() === "")
     ) {
-        throw new ApiError(400, "Title and Description required")
+        return res
+        .status(400)
+        .json(new ApiResponse(400, "Title and Description required"))
     }
 
     const imageArr = req.files
@@ -127,7 +147,9 @@ const updateExperience = asyncHandler ( async (req, res) => {
             }
             // console.log(urlArr);
             if (urlArr.length <= 0) {
-                throw new ApiError(400, "Something went wrong while uploading images")
+                return res
+                .status(400)
+                .json(new ApiResponse(400, "Something went wrong while uploading images"))
             }
         }
     
@@ -151,7 +173,9 @@ const updateExperience = asyncHandler ( async (req, res) => {
         const experience = await Experience.findByIdAndUpdate(experienceId, updateData)
 
         if (!experience) {
-            throw new ApiError(500, "Couldn't update experience")
+            return res
+            .status(500)
+            .json(new ApiResponse(500, "Couldn't update experience"))
         }
         console.log(experience, "experience")
     
@@ -159,7 +183,9 @@ const updateExperience = asyncHandler ( async (req, res) => {
         .status(200)
         .json(new ApiResponse(200, experience, "Experience updated successfully"))
     } catch (error) {
-        throw new ApiError(500, error?.message ||"Something went wrong while updating experience")
+        return res
+        .status(500)
+        .json(new ApiResponse(500, error?.message ||"Something went wrong while updating experience"))
     }
 })
 
@@ -169,22 +195,30 @@ const deleteExperience = asyncHandler(async (req, res) => {
 
     // console.log(experienceId, "experienceId");
     if (!experienceId) {
-        throw new ApiError(400, "Experience Id is required")
+        return res
+        .status(400)
+        .json(new ApiResponse(400, "Experience Id is required"))
     }
     
     if (!isValidObjectId(experienceId)) {
-        throw new ApiError(400, "Invalid Experience Id")
+        return res
+        .status(400)
+        .json(new ApiResponse(400, "Invalid Experience Id"))
     }
     
     const authorized = await isOwner(experienceId, req)
     if (!authorized) {
-        throw new ApiError(300, "Unauthorized request")
+        return res
+        .status(300)
+        .json(new ApiResponse(300, "Unauthorized request"))
     }
 
     const experience = await Experience.findById(experienceId)
 
     if (!experience) {
-        throw new ApiError(404, "Experience does not exists")
+        return res
+        .status(404)
+        .json(new ApiResponse(404, "Experience does not exists"))
     }
 
     try {
@@ -202,14 +236,18 @@ const deleteExperience = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, deleteResponse, "Experience deleted successfully"))
 
     } catch (error) {
-        throw new ApiError(400, "Something went wrong while deleting Experience")
+        return res
+        .status(400)
+        .json(new ApiResponse(400, "Something went wrong while deleting Experience"))
     }
 })
 
 const getAllExperienceByUser = asyncHandler ( async (req, res) => {
     const userId = req?.user._id
 
-    if (!userId) throw new ApiError(400, "Login to get all experiences")
+    if (!userId) return res
+        .status(400)
+        .json(new ApiResponse(400, "Login to get all experiences"))
     // console.log(req, "files");
     // console.log(userId);
     
@@ -221,7 +259,9 @@ const getAllExperienceByUser = asyncHandler ( async (req, res) => {
         .status(200)
         .json(new ApiResponse(200, experiences, "Experiences fetched successfully"))
     } catch (error) {
-        throw new ApiError(500, error?.message ||"Something went wrong while fetching experiences")
+        return res
+        .status(500)
+        .json(new ApiResponse(500, error?.message ||"Something went wrong while fetching experiences"))
     }
 })
 

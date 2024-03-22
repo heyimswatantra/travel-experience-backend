@@ -18,10 +18,15 @@ const addReview = asyncHandler ( async (req, res) => {
     const { experienceId, rating, reviewText } = req.body
     const userId = req?.user._id
 
-    if (!userId) throw new ApiError(400, "Login to create review")
+    if (!userId) 
+    return res
+    .status(400)
+    .json(new ApiResponse(400, {}, "Login to create review")) 
 
     if (!reviewText || !rating) {
-        throw new ApiError(400, "All fields required")
+        return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "All fields required"))
     }
 
     try {
@@ -33,7 +38,9 @@ const addReview = asyncHandler ( async (req, res) => {
         })
 
         if (!review) {
-            throw new ApiError(500, "Couldn't add review")
+            return res
+            .status(400)
+            .json(new ApiResponse(400, {}, "Couldn't add review"))
         }
 
         const experience = await Experience.findByIdAndUpdate(
@@ -44,14 +51,18 @@ const addReview = asyncHandler ( async (req, res) => {
         )
 
         if (!experience) {
-            throw new ApiError(500, "Couldn't add review to experience")
+            return res
+            .status(400)
+            .json(new ApiResponse(400, {},"Couldn't add review to experience"))
         }
 
         return res
         .status(200)
         .json(new ApiResponse(200, review, "Review added successfully"))
     } catch (error) {
-        throw new ApiError(500, error?.message ||"Something went wrong while adding review")
+        return res
+        .status(500)
+        .json(new ApiResponse(500, {}, error?.message ||"Something went wrong while adding review"))
     }
 })
 
@@ -60,7 +71,9 @@ const editReview = asyncHandler ( async (req, res) => {
 
     const author = isOwner(reviewId, req)
     if (!author) {
-        throw new ApiError(300, "Unauthorized Request")
+        return res
+    .status(300)
+    .json(new ApiResponse(300, {}, "Unauthorized Request"))
     }
     
     try {
@@ -70,7 +83,9 @@ const editReview = asyncHandler ( async (req, res) => {
         })
 
         if (!review) {
-            throw new ApiError(500, "Couldn't edit review")
+            return res
+            .status(500)
+            .json(new ApiResponse(500, {}, "Couldn't edit review"))
         }
 
         return res
@@ -78,7 +93,9 @@ const editReview = asyncHandler ( async (req, res) => {
         .json(new ApiResponse(200, review, "Review edited successfully"))
 
     } catch (error) {
-        throw new ApiError(500, error?.message ||"Something went wrong while editing review")
+        return res
+        .status(500)
+        .json(new ApiResponse(500, {}, error?.message ||"Something went wrong while editing review"))
     }
 })
 
@@ -87,14 +104,18 @@ const deleteReview = asyncHandler ( async (req, res) => {
 
     const author = isOwner(reviewId, req)
     if (!author) {
-        throw new ApiError(300, "Unauthorized Request")
+        return res
+        .status(300)
+        .json(new ApiResponse(300, {}, "Unauthorized Request"))
     }
     
     try {
         const deleteResponse = await Review.findByIdAndDelete(reviewId)
 
         if (!deleteResponse) {
-            throw new ApiError(500, "Couldn't delete review")
+            return res
+            .status(500)
+            .json(new ApiResponse(500, {}, "Couldn't delete review"))
         }
 
         return res
@@ -102,7 +123,9 @@ const deleteReview = asyncHandler ( async (req, res) => {
         .json(new ApiResponse(200, deleteResponse, "Review deleted successfully"))
 
     } catch (error) {
-        throw new ApiError(500, error?.message ||"Something went wrong while deleting review")
+        return res
+        .status(200)
+        .json(new ApiResponse(500, {}, error?.message ||"Something went wrong while deleting review"))
     }
 })
 
