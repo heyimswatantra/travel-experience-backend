@@ -200,6 +200,19 @@ const logoutUser = asyncHandler (async (req, res) => {
     )
 })
 
+const getCurrentUser = asyncHandler( async (req, res) => {
+    if(!req?.user){
+        return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "Kindly Login"))
+    }
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, req.user, "Current User fetched successfully")
+    )
+})
+
 const changePassword = asyncHandler( async (req, res) => {
     const {oldPassword, newPassword} = req.body
     const user = await User.findById(req.user?._id)
@@ -285,6 +298,7 @@ export {
     loginUser,
     logoutUser,
     changePassword,
+    getCurrentUser,
     // updateAccountDetails,
     updateUserAvatar,
 }
