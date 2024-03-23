@@ -1,13 +1,15 @@
 import { Router } from "express";
 import { 
     changePassword, 
-
+    
 
 
     loginUser,
     logoutUser,
     // refreshAccessToken, 
     registerUser,
+    getCurrentUser,
+    
     // updateAccountDetails, 
     updateUserAvatar, 
 
@@ -28,6 +30,8 @@ router.route("/logout").post(verifyJWT, logoutUser)
 
 router.route("/change-password").post(verifyJWT, changePassword)
 router.route("/current-user").get(verifyJWT, getCurrentUser)
+router.route("/experiences").get()
+
 
 // router.route("/update-account").patch(verifyJWT, updateAccountDetails)
 

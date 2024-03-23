@@ -265,9 +265,31 @@ const getAllExperienceByUser = asyncHandler ( async (req, res) => {
     }
 })
 
+const getAllExperiences = asyncHandler ( async (req, res) => {
+
+    try {
+        const experiences = await Experience.find({})
+
+        if (!experiences) {
+            return res
+            .status(400)
+            .json(new ApiResponse(400, {}, "Something went wrong"))
+        }
+        
+        return res
+        .status(200)
+        .json(new ApiResponse(200, experiences, "Experiences fetched successfully"))
+    } catch (error) {
+        return res
+        .status(500)
+        .json(new ApiResponse(500, error?.message ||"Something went wrong while fetching all experiences"))
+    }
+})
+
 export {
     addExperience,
     updateExperience,
     deleteExperience,
-    getAllExperienceByUser
+    getAllExperienceByUser,
+    getAllExperiences,
 }
